@@ -1,0 +1,17 @@
+---
+- name: "Daemon reload"
+  ansible.builtin.systemd:
+    daemon_reload: "yes"
+- name: "Restart restic-exporter"
+  ansible.builtin.systemd:
+    name: "{{ hostvars[inventory_hostname]['restic_exporter_service'] }}"
+    state: "restarted"
+  when:
+    - "hostvars[inventory_hostname]['restic_exporter'] is defined"
+    - "hostvars[inventory_hostname]['restic_exporter'] != ''"
+    - "hostvars[inventory_hostname]['restic_exporter'] |
+       community.general.json_query(vars['restic_exporter_restart']) is defined"
+    - "hostvars[inventory_hostname]['restic_exporter'] |
+       community.general.json_query(vars['restic_exporter_restart']) == 'true'"
+  vars:
+    restic_exporter_restart: "[] | map(&restart || 'false', @) | [0]"

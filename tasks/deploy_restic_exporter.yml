@@ -1,0 +1,39 @@
+---
+- name: "restic_exporter | Deploy restic-exporter service configuration"
+  ansible.builtin.template:
+    src: "restic_exporter.j2"
+    dest: "{{ '/etc/systemd/system/' +
+      hostvars[inventory_hostname]['restic_exporter_service'] }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify:
+    - "Daemon reload"
+    - "Restart restic-exporter"
+- name: "restic_exporter | Enable restic-exporter"
+  ansible.builtin.systemd:
+    name: "{{ hostvars[inventory_hostname]['restic_exporter_service'] }}"
+    enabled: "yes"
+  when:
+    - "hostvars[inventory_hostname]['restic_exporter'] is defined"
+    - "hostvars[inventory_hostname]['restic_exporter'] != ''"
+    - "hostvars[inventory_hostname]['restic_exporter'] |
+       community.general.json_query(vars['restic_exporter_enable']) is defined"
+    - "hostvars[inventory_hostname]['restic_exporter'] |
+       community.general.json_query(vars['restic_exporter_enable']) == 'true'"
+  vars:
+    restic_exporter_enable: "[] | map(&enable || 'false', @) | [0]"
+- name: "restic_exporter | Ensure docker is run"
+  ansible.builtin.systemd:
+    name: "docker"
+    state: "started"
+    enabled: "yes"
+  when:
+    - "hostvars[inventory_hostname]['restic_exporter'] is defined"
+    - "hostvars[inventory_hostname]['restic_exporter'] != ''"
+    - "hostvars[inventory_hostname]['restic_exporter'] |
+       community.general.json_query(vars['restic_exporter_enable']) is defined"
+    - "hostvars[inventory_hostname]['restic_exporter'] |
+       community.general.json_query(vars['restic_exporter_enable']) == 'true'"
+  vars:
+    restic_exporter_enable: "[] | map(&enable || 'false', @) | [0]"

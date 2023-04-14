@@ -1,0 +1,69 @@
+{{ '## ' + hostvars[inventory_hostname]['restic_exporter_service'] }}
+{{ '# ' + ansible_managed }}
+{{ '# Do not edit manually' }}
+
+{{ '[Unit]' }}
+{{ 'After=docker.service' }}
+{{ 'Requires=docker.service' }}
+
+{{ '[Service]' }}
+{{ 'Restart=always' }}
+{{ 'ExecStartPre=-' +
+  hostvars[inventory_hostname]['restic_exporter_docker_path'] + ' rm -f ' +
+  hostvars[inventory_hostname]['restic_exporter_docker_name'] }}
+{{ 'ExecStart=' + hostvars[inventory_hostname]['restic_exporter_docker_path'] +
+  ' run -p ' ~ vars['restic_exporter_port'] ~ ':' ~
+  vars['restic_exporter_port'] ~ ' --name ' +
+  hostvars[inventory_hostname]['restic_exporter_docker_name'] -}}
+{% if vars['restic_exporter_settings'] is defined and
+  vars['restic_exporter_settings'] != '' %}
+{% for r in vars['restic_exporter_settings'] %}
+{% if r.address is defined and r.address != '' %}
+{{ ' \\' }}
+{{ '-e "LISTEN_ADDRESS=' + r.address + '"' -}}
+{% endif %}
+{{ ' \\' }}
+{{ '-e "LISTEN_PORT=' ~ vars['restic_exporter_port'] ~ '"' -}}
+{% if r.refresh_interval is defined and r.refresh_interval != '' %}
+{{ ' \\' }}
+{{ '-e "REFRESH_INTERVAL=' ~ r.refresh_interval ~ '"' -}}
+{% endif %}
+{% if r.exit_on_error is defined and r.exit_on_error in ['true', 'false'] %}
+{{ ' \\' }}
+{{ '-e "EXIT_ON_ERROR=' + r.exit_on_error + '"' -}}
+{% endif %}
+{% if r.no_check is defined and r.no_check in ['true', 'false'] %}
+{{ ' \\' }}
+{{ '-e "NO_CHECK=' + r.no_check + '"' -}}
+{% endif %}
+{% if r.no_stats is defined and r.no_stats in ['true', 'false'] %}
+{{ ' \\' }}
+{{ '-e "NO_STATS=' + r.no_stats + '"' -}}
+{% endif %}
+{% if r.access_key is defined and r.access_key != '' %}
+{{ ' \\' }}
+{{ '-e "AWS_ACCESS_KEY_ID=' + r.access_key + '"' -}}
+{% endif %}
+{% if r.secret_key is defined and r.secret_key != '' %}
+{{ ' \\' }}
+{{ '-e "AWS_SECRET_ACCESS_KEY=' + r.secret_key + '"' -}}
+{% endif %}
+{% if r.password is defined and r.password != '' %}
+{{ ' \\' }}
+{{ '-e "RESTIC_REPO_PASSWORD=' + r.password + '"' -}}
+{% endif %}
+{% if r.repo is defined and r.repo != '' %}
+{{ ' \\' }}
+{{ '-e "RESTIC_REPO_URL=' + r.repo + '"' -}}
+{% endif %}
+{% endfor %}
+{% endif %}
+{{ ' ngosang/' + hostvars[inventory_hostname]['restic_exporter_docker_name'] +
+  ':' + vars['restic_exporter_version'] }}
+{{ 'ExecStop=' + hostvars[inventory_hostname]['restic_exporter_docker_path'] +
+  ' stop ' + hostvars[inventory_hostname]['restic_exporter_docker_name'] }}
+{{ 'SyslogIdentifier=' +
+  hostvars[inventory_hostname]['restic_exporter_docker_name'] }}
+
+{{ '[Install]' }}
+{{ 'WantedBy=docker.service' }}

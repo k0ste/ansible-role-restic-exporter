@@ -1,0 +1,28 @@
+---
+- name: "restic_exporter | Assert that system manager is systemd"
+  ansible.builtin.assert:
+    that:
+      - "hostvars[inventory_hostname]['ansible_service_mgr'] == 'systemd'"
+    msg: "System manager is not systemd"
+    quiet: "true"
+- name: "restic_exporter | Add the OS specific varibles"
+  ansible.builtin.include_vars:
+    file: "{{ hostvars[inventory_hostname]['ansible_os_family'] + '.yml' }}"
+- name: "restic_exporter | Set facts about restic-exporter role"
+  ansible.builtin.set_fact:
+    restic_exporter_version:
+      "{{ hostvars[inventory_hostname]['restic_exporter'] |
+      community.general.json_query('[].version | [0]') | default('latest') }}"
+    restic_exporter_settings:
+      "{{ hostvars[inventory_hostname]['restic_exporter'] |
+      community.general.json_query('[].settings[]') }}"
+    restic_exporter_port: "{{ hostvars[inventory_hostname]['restic_exporter'] |
+      community.general.json_query('[].settings[].port | [0]') }}"
+- name: "restic_exporter | Set facts about service port"
+  ansible.builtin.set_fact:
+    restic_exporter_port: "8001"
+  when:
+    - "(vars['restic_exporter_port'] is defined and
+      (vars['restic_exporter_port'] == '' or
+      vars['restic_exporter_port'] == []) or
+      vars['restic_exporter_port'] is not defined)"

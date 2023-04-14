@@ -1,0 +1,5 @@
+---
+restic_exporter_package: 'docker'
+restic_exporter_service: 'docker-restic-exporter.service'
+restic_exporter_docker_name: 'restic-exporter'
+restic_exporter_docker_path: '/usr/bin/docker'
