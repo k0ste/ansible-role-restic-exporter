@@ -13,7 +13,7 @@
   hostvars[inventory_hostname]['restic_exporter_docker_name'] }}
 {{ 'ExecStart=' + hostvars[inventory_hostname]['restic_exporter_docker_path'] +
   ' run -p ' ~ vars['restic_exporter_port'] ~ ':' ~
-  vars['restic_exporter_port'] ~ ' --name ' +
+  vars['restic_exporter_port'] ~ ' --pull always --name ' +
   hostvars[inventory_hostname]['restic_exporter_docker_name'] -}}
 {% if vars['restic_exporter_settings'] is defined and
   vars['restic_exporter_settings'] != '' %}
@@ -39,6 +39,14 @@
 {% if r.no_stats is defined and r.no_stats in ['true', 'false'] %}
 {{ ' \\' }}
 {{ '-e "NO_STATS=' + r.no_stats + '"' -}}
+{% endif %}
+{% if r.no_locks is defined and r.no_locks in ['true', 'false'] %}
+{{ ' \\' }}
+{{ '-e "NO_LOCKS=' + r.no_locks + '"' -}}
+{% endif %}
+{% if r.include_paths is defined and r.include_paths in ['true', 'false'] %}
+{{ ' \\' }}
+{{ '-e "INCLUDE_PATHS=' + r.include_paths + '"' -}}
 {% endif %}
 {% if r.access_key is defined and r.access_key != '' %}
 {{ ' \\' }}
