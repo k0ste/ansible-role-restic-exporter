@@ -3,9 +3,9 @@
 {{ '# Do not edit manually' }}
 
 {{ '[Unit]' }}
-{{ 'After=docker.service network.target' }}
-{{ 'Requires=docker.service' }}
-{{ 'Wants=network.target' }}
+{{ 'After=network-online.target docker.service docker.socket' }}
+{{ 'Requires=docker.service docker.socket' }}
+{{ 'Wants=network-online.target' }}
 
 {{ '[Service]' }}
 {{ 'Restart=always' }}
