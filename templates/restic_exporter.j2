@@ -6,9 +6,12 @@
 {{ 'After=network-online.target docker.service docker.socket' }}
 {{ 'Requires=docker.service docker.socket' }}
 {{ 'Wants=network-online.target' }}
+{{ 'StartLimitIntervalSec=30' }}
+{{ 'StartLimitBurst=3' }}
 
 {{ '[Service]' }}
 {{ 'Restart=always' }}
+{{ 'RestartSec=10' }}
 {{ 'ExecStartPre=-' +
   hostvars[inventory_hostname]['restic_exporter_docker_path'] + ' rm -f ' +
   hostvars[inventory_hostname]['restic_exporter_docker_name'] }}
