@@ -1,12 +1,15 @@
 ---
-- ansible.builtin.import_tasks:
+- name: "restic_exporter | Include pre requisite tasks"
+  ansible.builtin.import_tasks:
     file: "pre_requisite.yml"
-- ansible.builtin.include_tasks:
+- name: "restic_exporter | Include packages tasks"
+  ansible.builtin.include_tasks:
     file: "packages.yml"
   when:
     - "hostvars[inventory_hostname]['restic_exporter'] is defined"
     - "hostvars[inventory_hostname]['restic_exporter'] != ''"
-- ansible.builtin.include_tasks:
+- name: "restic_exporter | Include deployment tasks"
+  ansible.builtin.include_tasks:
     file: "deploy_restic_exporter.yml"
   when:
     - "vars['restic_exporter_settings'] is defined"

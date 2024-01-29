@@ -1,11 +1,12 @@
 # ansible-restic-exporter
 
 Role for deploy Prometheus
-[restic-exporter](https://github.com/ngosang/restic-exporter)
+[restic-exporter](//github.com/ngosang/restic-exporter)
 
 ## Requirements
 
 * Ansible 3.0.0+;
+* restic-exporter >= 1.5.0
 
 Example configuration
 -------------------------

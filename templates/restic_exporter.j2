@@ -3,7 +3,8 @@
 {{ '# Do not edit manually' }}
 
 {{ '[Unit]' }}
-{{ 'After=network-online.target docker.service docker.socket' }}
+{{ 'After=network.target network-online.target nss-lookup.target' }}
+{{ 'After=docker.service docker.socket' }}
 {{ 'Requires=docker.service docker.socket' }}
 {{ 'Wants=network-online.target' }}
 {{ 'StartLimitIntervalSec=30' }}
@@ -62,11 +63,11 @@
 {% endif %}
 {% if r.password is defined and r.password != '' %}
 {{ ' \\' }}
-{{ '-e "RESTIC_REPO_PASSWORD=' + r.password + '"' -}}
+{{ '-e "RESTIC_PASSWORD=' + r.password + '"' -}}
 {% endif %}
 {% if r.repo is defined and r.repo != '' %}
 {{ ' \\' }}
-{{ '-e "RESTIC_REPO_URL=' + r.repo + '"' -}}
+{{ '-e "RESTIC_REPOSITORY=' + r.repo + '"' -}}
 {% endif %}
 {% endfor %}
 {% endif %}
